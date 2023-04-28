@@ -7,6 +7,9 @@ pragma solidity ^0.8.0;
 /// @dev This contract is written in Solidity version 0.8.0
 contract Ticketing {
 
+    event EventCreated(address indexed owner, uint256 indexed eventId, string name, uint256 VipticketPrice, uint256 SilverticketPrice, string eventDate);
+    event TicketBought(address indexed buyer, String category, uint256 ticketPrice );
+
     /// @notice Struct for storing information about a ticket
     struct Ticket {
         uint256 ticketId;
@@ -62,7 +65,7 @@ contract Ticketing {
     uint256 public numEvents;
 
     /// @notice Duration for which tickets will be sold for an event
-    uint256 constant SELLINGDURSTION = 10 minutes;
+    uint256 constant SELLINGDURATION = 10 minutes;
 
     /// @notice Allows an event organizer to create an event and sell tickets
     function addEvent(
@@ -81,7 +84,7 @@ contract Ticketing {
         newEvent.numSilverTickets = _numSilverTickets;
         newEvent.vipTicketPrice = _vipTicketPrice;
         newEvent.silverTicketPrice = _silverTicketPrice;
-        newEvent.sellingDuration = block.timestamp + SELLINGDURSTION;
+        newEvent.sellingDuration = block.timestamp + 600;
         newEvent.eventName = _eventName;
         newEvent.eventDate = _eventDate;
         newEvent.eventVenue = _eventVenue;  
@@ -117,6 +120,9 @@ contract Ticketing {
         // Add order for user
         myEventCount[msg.sender]++; // <-- Order ID
         myEvents[msg.sender][myEventCount[msg.sender]] = newEvent;
+        
+
+         emit EventCreated(msg.sender, newEvent.eventId, newEvent.eventName, newEvent.vipTicketPrice, newEvent.silverTicketPrice, _eventDate);
 
    
     }
@@ -127,13 +133,17 @@ contract Ticketing {
         uint256 numTicketsSold;
         uint256 ticketPrice;
 
-        if (keccak256(bytes(_category)) == keccak256(bytes("VIP"))) {
+        require(block.timestamp <= eventToBuy.sellingDuration, "Ticket Selling Duration has passed");
+
+        
+
+        if (keccak256(bytes32(_category)) == keccak256(bytes32("VIP"))) {
             require(eventToBuy.vipSold < eventToBuy.numVipTickets, "All VIP tickets are sold out");
             ticketsToBuy = eventToBuy.vipTickets;
             numTicketsSold = eventToBuy.vipSold;
             ticketPrice = eventToBuy.vipTicketPrice;
             eventToBuy.vipSold++;
-        } else if (keccak256(bytes(_category)) == keccak256(bytes("Silver"))) {
+        } else if (keccak256(bytes32(_category)) == keccak256(bytes32("Silver"))) {
             require(eventToBuy.silverSold < eventToBuy.numSilverTickets, "All Silver tickets are sold out");
             ticketsToBuy = eventToBuy.silverTickets;
             numTicketsSold = eventToBuy.silverSold;
@@ -153,6 +163,10 @@ contract Ticketing {
         // Add order for user
         orderCount[msg.sender]++; // <-- Order ID
         myOrders[msg.sender][orderCount[msg.sender]] = order;
+
+        
+
+        emit TicketBought(msg.sender, _category, ticketPrice )
     }
 
     /// @notice Gets the information for an event
