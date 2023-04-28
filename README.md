@@ -8,6 +8,7 @@ Yob is a ticket booking Dapp offers secure, fast and decentralized transactions 
 The purpose of this Reserve is to provide a platform for the sale and purchase of event tickets,Users can purchase tickets for events through the smart contract and their purchases will be recorded and tracked.
 
 ## Technologies Used
+1. Solidity
 1. Next.js
 2. Hardhat
 3. celo [Alphajores testnet](https://explorer.celo.org/alfajores/)
