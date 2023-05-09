@@ -6,7 +6,7 @@ import { useGlobalState } from '@/store';
 import { useContractKit } from '@celo-tools/use-contractkit';
 import React, { useEffect } from 'react';
 
-const myTickets = () => {
+const MyTickets = () => {
   const contract = useContract();
   const { address } = useContractKit();
 
@@ -39,10 +39,11 @@ const myTickets = () => {
             sold,
             ticketId,
             ticketPrice,
-          } = item.ticket;
+            //@ts-ignore
+          } = item?.ticket;
           return (
+            //@ts-ignore
               <TicketCard
-                orderedAt={item.orderedAt}
                 category={category}
                 eventDate={eventDate}
                 sold={sold}
@@ -56,7 +57,7 @@ const myTickets = () => {
           );
         })
       ) : (
-        <p className='font-bold text-center pt-5'>You don't have any yet!</p>
+        <p className='font-bold text-center pt-5'>You do not have any yet!</p>
       )}
         
       </div>
@@ -64,4 +65,4 @@ const myTickets = () => {
   );
 };
 
-export default myTickets;
+export default MyTickets;

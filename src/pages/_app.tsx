@@ -5,12 +5,10 @@ import {
   ContractKitProvider,
   Alfajores,
   NetworkNames,
-  useContractKit,
 } from '@celo-tools/use-contractkit';
 
 import '@celo/react-celo/lib/styles.css';
 import ClientOnly from '@/components/ClientOnly';
-import { useReadAllEvents } from '@/hooks/useReadAllEvent';
 import AddEvent from '@/components/AddEvent';
 import Loading from '@/components/Loading';
 import Alert from '@/components/Alert';

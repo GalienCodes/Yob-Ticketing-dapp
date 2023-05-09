@@ -6,7 +6,7 @@ import { useContractKit } from '@celo-tools/use-contractkit';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 
-const myEvents = () => {
+const MyEvents = () => {
   const contract = useContract();
   const { address } = useContractKit();
 
@@ -60,7 +60,7 @@ const myEvents = () => {
           })
         ) : (
           <p className='font-bold text-center pt-5 text-white'>
-            You don't have any yet!
+            You do not have any yet!
           </p>
         )}
       </div>
@@ -68,4 +68,4 @@ const myEvents = () => {
   );
 };
 
-export default myEvents;
+export default MyEvents;

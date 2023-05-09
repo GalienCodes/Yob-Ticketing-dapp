@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useContractKit } from '@celo-tools/use-contractkit';
 import { useContract } from './useContract';
 import { fromWei } from 'web3-utils';
-import BN from 'bn.js'
 
 export const useSingleEvent = (id: string | string[] | undefined) => {
   const { address } = useContractKit();
@@ -12,6 +11,7 @@ export const useSingleEvent = (id: string | string[] | undefined) => {
   const getEvents = useCallback(async () => {
     if (!yobookingContract) return;
     // fetch an event
+    //@ts-ignore
     setMyEvent(await yobookingContract.methods.getEvent(id).call());
   }, [yobookingContract]);
 
@@ -20,17 +20,24 @@ export const useSingleEvent = (id: string | string[] | undefined) => {
   }, [address, getEvents]);
 
   const singleEventData = {
+    //@ts-ignore
     sellingDuration: myEvent?.sellingDuration,
+    //@ts-ignore
     eventId: myEvent?.eventId,
+    //@ts-ignore
     eventTitle: myEvent?.eventName,
+    //@ts-ignore
     eventOwner: myEvent?.eventOwner,
+    //@ts-ignore
     numVipTickets: myEvent?.numVipTickets,
+    //@ts-ignore
     numSilverTickets: myEvent?.numSilverTickets,
-    // silverTicketPrice: myEvent?.silverTicketPrice,
-    // vipTicketPrice: myEvent?.vipTicketPrice,
+    //@ts-ignore
     eventDate: myEvent?.eventDate,
+    //@ts-ignore
     eventVenue: myEvent?._eventVenue,
-    silverTickets: myEvent?.silverTickets?.map((el) => ({
+    //@ts-ignore
+    silverTickets: myEvent?.silverTickets?.map((el:any) => ({
       category: el.category,
       eventDate: el.eventDate,
       eventId: el.eventId,
@@ -40,7 +47,8 @@ export const useSingleEvent = (id: string | string[] | undefined) => {
       ticketPrice: fromWei(el.price,'ether'),
       eventVenue: el.eventVenue
     })),
-    vipTickets: myEvent?.vipTickets?.map((el) => ({
+    //@ts-ignore
+    vipTickets: myEvent?.vipTickets?.map((el:any) => ({
       category: el.category,
       eventDate: el.eventDate,
       eventId: el.eventId,

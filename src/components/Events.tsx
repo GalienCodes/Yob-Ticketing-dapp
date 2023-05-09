@@ -1,9 +1,25 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useGlobalState } from '../store';
 import EventCard from './cards/EventCard';
 import { useReadAllEvents } from '@/hooks/useReadAllEvent';
+
+export interface Ticket {
+  category: string;
+  eventDate?: number | undefined;
+  eventTitle: string;
+  sold: boolean;
+  ticketId: number;
+  ticketPrice: string;
+  eventVenue: string;
+  eventId: number;
+  
+}
+// eventId,
+// eventTitle,
+// sold,
+// ticketPrice,
+
 
 const Events = () => {
   const getEvents = useReadAllEvents();
@@ -13,17 +29,17 @@ const Events = () => {
         {getEvents?.map(
           (
             item: {
-              eventId: any;
-              eventDate?: any;
-              owner?: any;
-              eventName?: any;
-              numSilverTickets?: any;
-              numVipTickets?: any;
-              sellingDuration?: any;
-              silverTicketPrice?: any;
-              vipTicketPrice?: any;
-              vipTickets:any[];
-              silverTickets:any[];
+              eventId: number;
+              eventDate?: number;
+              owner?: string | undefined;
+              eventName?: string;
+              numSilverTickets?: number;
+              numVipTickets?: number;
+              sellingDuration?: string;
+              silverTicketPrice?: string;
+              vipTicketPrice?: string;
+              vipTickets:Ticket[];
+              silverTickets:Ticket[];
               eventVenue: string;
             },
             i: number
@@ -46,7 +62,6 @@ const Events = () => {
               <Link href={`/eventdetails/${item.eventId}`} key={i}>
                 <EventCard
                   eventDate={eventDate}
-                  eventId={eventId}
                   owner={owner}
                   eventName={eventName}
                   numSilverTickets={numSilverTickets}
@@ -55,9 +70,9 @@ const Events = () => {
                   vipTicketPrice={vipTicketPrice}
                   vipTickets={vipTickets}
                   silverTickets={silverTickets}
-                  sellingDuration={sellingDuration} 
-                  eventVenue={eventVenue}
-                />
+                  sellingDuration={sellingDuration}
+                  eventVenue={eventVenue} 
+                  eventId={0}                />
               </Link>
             );
           }

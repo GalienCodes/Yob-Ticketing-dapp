@@ -4,9 +4,24 @@ import Countdown from 'react-countdown';
 import { FaTicketAlt } from 'react-icons/fa';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { displayData, minutesRemaining, truncate } from '../../store';
+import { type } from 'os';
+import { Ticket } from '../Events';
+interface IEventCard {
+  eventId: number;
+  eventDate?: number | undefined;
+  owner?: string | undefined;
+  eventName?: string;
+  numSilverTickets?: number;
+  numVipTickets?: number;
+  sellingDuration?: string;
+  silverTicketPrice?: string;
+  vipTicketPrice?: string;
+  vipTickets: Ticket[];
+  silverTickets: Ticket[];
+  eventVenue: string;
+};
 
 const EventCard = ({
-  eventId,
   eventDate,
   owner,
   eventName,
@@ -18,12 +33,14 @@ const EventCard = ({
   vipTickets,
   silverTickets,
   eventVenue,
-}) => {
+}:IEventCard) => {
   const oneHour = new Date(
     new Date().setMinutes(
-      new Date().getMinutes() - -minutesRemaining(sellingDuration).minutes
+      new Date().getMinutes() - -minutesRemaining(Number(sellingDuration)).minutes
     )
   ).toISOString();
+  // console.log('sellingDuration=>',typeof(sellingDuration));
+  
 
   return (
     <div className='bg-[#2db369] shadow-md rounded py-4 px-4 text-white'>

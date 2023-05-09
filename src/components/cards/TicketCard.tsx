@@ -10,6 +10,21 @@ import { useContractKit } from '@celo-tools/use-contractkit';
 import { useContract } from '@/hooks/useContract';
 import { buyTicket } from '@/hooks/blockchain';
 
+
+
+interface ITicketCard{
+  category: string;
+  eventDate?: number | undefined;
+  eventTitle: string;
+  sold: boolean;
+  ticketId: number;
+  ticketPrice: string;
+  eventVenue: string;
+  eventId: number;
+  completed:boolean;
+  eventOwner:string;
+}
+
 const TicketCard = ({
   category,
   eventDate,
@@ -21,8 +36,7 @@ const TicketCard = ({
   ticketPrice,
   completed,
   eventOwner,
-  orderedAt
-}) => {
+}:ITicketCard) => {
   const router = useRouter();
   const { connect, address } = useContractKit();
   const yobookingContract = useContract();
@@ -75,15 +89,6 @@ const TicketCard = ({
             Venue: <HiOutlineLocationMarker className='mx-1' />
             <span className='font-bold'> {eventVenue && eventVenue}</span>
           </h2>
-          {orderedAt && (
-            <h2 className='text-sm font-medium'>
-              {' '}
-              Ordered{' '}
-              <span className='font-bold'>
-                {moment(Number(orderedAt + '000')).fromNow()}
-              </span>
-            </h2>
-          )}
           {completed && !sold ? (
             <button
               type='button'

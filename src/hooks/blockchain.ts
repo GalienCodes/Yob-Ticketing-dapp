@@ -1,19 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useContractKit } from '@celo-tools/use-contractkit';
-import { useContract } from './useContract';
-import { ContractKit } from '@celo/contractkit';
 import { toWei } from 'web3-utils';
 import { setAlert, setGlobalState, setLoadingMsg } from '@/store';
 import { structuredEvent } from './useReadAllEvent';
 import { fromWei } from 'web3-utils';
-import { toast } from 'react-hot-toast';
 
 export const buyTicket = async (
-  eventId,
-  category,
-  ticketPrice,
-  yobookingContract,
-  address
+  eventId: number,
+  category: string,
+  ticketPrice: string | import("bn.js"),
+  yobookingContract: any | undefined,
+  address: string | null
 ) => {
   ticketPrice = toWei(ticketPrice.toString(), 'ether');
 
@@ -29,19 +24,19 @@ export const buyTicket = async (
   }
 };
 
-export const getMyEvents = async (yobookingContract, address) => {
+export const getMyEvents = async (yobookingContract: any | undefined, address: string | null) => {
   if (address) {
     try {
       // create an empty array that will contain every event added
       const allMyEvents = [];
       // assign the myEventCount to the variable counter
       setGlobalState('loaddata',{ show: true, msg: 'loading events', color: '' })
-      const counter = await yobookingContract.methods
+      const counter = await yobookingContract?.methods
         .myEventCount(address)
         .call();
 
       for (let i = 0; i < counter; i++) {
-        const singleEvent = await yobookingContract.methods
+        const singleEvent = await yobookingContract?.methods
           .myEvents(address, i + 1)
           .call();
         allMyEvents.push(singleEvent);
@@ -54,10 +49,9 @@ export const getMyEvents = async (yobookingContract, address) => {
   }
 };
 
-const structuredTicket = (tickets) => {
+const structuredTicket = (tickets: any[]) => {
   return tickets
-    .map((item) => ({
-      orderedAt: item.timestamp,
+    .map((item: { ticket: { category: any; eventDate: any; eventId: any; eventName: string| any; ticketId: any; isSold: boolean|any; eventVenue: any ;price: any | import("bn.js"); }; }) => ({
       ticket: {
         category: item.ticket.category,
         eventDate: item.ticket.eventDate,
@@ -67,20 +61,19 @@ const structuredTicket = (tickets) => {
         sold: item.ticket.isSold,
         eventVenue: item.ticket.eventVenue,
         ticketPrice: fromWei(item.ticket.price, 'ether'),
-        orderedAt: item.ticket.timestamp,
       },
     }))
     .reverse();
 };
 
-export const getMyTickets = async (yobookingContract, address) => {
+export const getMyTickets = async (yobookingContract: any | undefined, address: string | null) => {
   if (address)
     try {
       // create an empty array that will contain every ticket purchased
       const allMyTickets = [];
       // assign the orderCount to the variable counter
       setGlobalState('loaddata',{ show: true, msg: 'loading tickets', color: '' })
-      const counter = await yobookingContract.methods
+      const counter = await yobookingContract?.methods
         .orderCount(address)
         .call();
 
@@ -90,7 +83,11 @@ export const getMyTickets = async (yobookingContract, address) => {
           .call();
         allMyTickets.push(ticket);
       }
+
+
+      //@ts-ignore
       setGlobalState('myTickets', structuredTicket(allMyTickets));
+
       setGlobalState('loaddata',{ show: false, msg: '', color: '' })
 
       return structuredTicket(allMyTickets);
@@ -100,15 +97,15 @@ export const getMyTickets = async (yobookingContract, address) => {
 };
 
 export const writeEvent = async (
-  yobookingContract,
-  address,
-  numVipTickets,
-  numSilverTickets,
-  vipTicketPrice,
-  silverTicketPrice,
-  title,
-  eventDate,
-  eventVenue
+  yobookingContract: any | undefined,
+  address: string | null,
+  numVipTickets: string | number,
+  numSilverTickets: string | number,
+  vipTicketPrice: string | import("bn.js"),
+  silverTicketPrice: string | import("bn.js"),
+  title: string,
+  eventDate: number,
+  eventVenue: string
 ) => {
   try {
     if (address) {

@@ -2,7 +2,7 @@ import React from 'react'
 import { AiFillLinkedin } from 'react-icons/ai';
 
 
-const about = () => {
+const About = () => {
   return (
     <div className='py-24 sm:py-28 max-w-4xl mx-auto text-white'>
       <div className=' mx-4'>
@@ -41,4 +41,4 @@ const about = () => {
   )
 }
 
-export default about
+export default About

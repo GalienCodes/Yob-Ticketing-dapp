@@ -1,4 +1,5 @@
 'use client';
+import { Ticket } from '@/components/Events';
 import TicketCard from '@/components/cards/TicketCard';
 import { useSingleEvent } from '@/hooks/useSingleEvent';
 import { displayData, minutesRemaining, useGlobalState } from '@/store';
@@ -7,7 +8,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Countdown from 'react-countdown';
 
-const eventdetails = () => {
+const Eventdetails = () => {
   const router = useRouter();
   const { id } = router.query;
   const eventDetails = useSingleEvent(id);
@@ -76,24 +77,25 @@ const eventdetails = () => {
                     ? avialableSilverTickets?.map(
                         (
                           item: {
-                            category: any;
-                            eventDate: any;
-                            eventId: any;
-                            eventTitle: any;
-                            sold: any;
-                            ticketId: any;
-                            ticketPrice: any;
+                            category: string;
+                            eventDate?: number | undefined;
+                            eventTitle: string;
+                            sold: boolean;
+                            ticketId: number;
+                            ticketPrice: string;
+                            eventVenue: string;
+                            eventId: number;
                           },
                           i: number
                         ) => {
                           const {
                             category,
                             eventDate,
-                            eventId,
                             eventTitle,
                             sold,
                             ticketId,
                             ticketPrice,
+                            eventId,
                           } = item;
                           return (
                             <TicketCard
@@ -103,7 +105,7 @@ const eventdetails = () => {
                               eventVenue={
                                 eventDetails && eventDetails?.eventVenue
                               }
-                              eventId={id}
+                              eventId={eventId}
                               eventTitle={eventTitle}
                               ticketId={ticketId}
                               ticketPrice={ticketPrice}
@@ -132,13 +134,14 @@ const eventdetails = () => {
                     ? avialableVipTickets?.map(
                         (
                           item: {
-                            category: any;
-                            eventDate: any;
-                            eventId: any;
-                            eventTitle: any;
-                            sold: any;
-                            ticketId: any;
-                            ticketPrice: any;
+                            category: string;
+                            eventDate?: number | undefined;
+                            eventTitle: string;
+                            sold: boolean;
+                            ticketId: number;
+                            ticketPrice: string;
+                            eventVenue: string;
+                            eventId: number;
                           },
                           i: number
                         ) => {
@@ -181,4 +184,4 @@ const eventdetails = () => {
   );
 };
 
-export default eventdetails;
+export default Eventdetails;

@@ -8,7 +8,7 @@ const LoadData = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-screen h-screen z-10
+      className={`fixed top-0 left-0 w-screen h-screen z-4
       flex items-center justify-center bg-[#2db369] 
      transform transition-transform
       duration-300 ${loaddata.show ? 'scale-100' : 'scale-0'}`}

@@ -24,7 +24,7 @@ const {setGlobalState, useGlobalState, getGlobalState }=createGlobalState({
     
   } 
   
-  const displayData = (eventDate: number)=>{
+  const displayData = (eventDate: any )=>{
     const date = new Date(eventDate * 1000);
     const dateString =  date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
     return dateString;
@@ -43,7 +43,7 @@ const {setGlobalState, useGlobalState, getGlobalState }=createGlobalState({
   }
 
 
-const truncate = (text:string, startChars:number, endChars:number, maxLength:number) => {
+const truncate = (text: string | any, startChars:number, endChars:number, maxLength:number) => {
   if (text.length > maxLength) {
     var start = text.substring(0, startChars)
     var end = text.substring(text.length - endChars, text.length)

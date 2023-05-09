@@ -23,7 +23,7 @@ const NavBar = () => {
   }
 
   return (
-    <div className=' sm:px-8 bg-[#2db369] z-20 mx-auto w-full fixed shadow-sm text-gray-50'>
+    <div className=' sm:px-8 bg-[#2db369] z-8 mx-auto w-full fixed shadow-sm text-gray-50'>
       <div className=' flex items-center justify-between py-4 sm:mx-0 mx-4 '>
         <Link href={'/'}>
           <h1 className='font-black text-4xl'>Yob</h1>
