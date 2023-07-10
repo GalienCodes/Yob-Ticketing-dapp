@@ -8,12 +8,12 @@ pragma solidity ^0.8.0;
 contract Ticketing {
 
     event EventCreated(address indexed owner, uint256 indexed eventId, string name, uint256 VipticketPrice, uint256 SilverticketPrice, string eventDate);
-    event TicketBought(address indexed buyer, String category, uint256 ticketPrice );
+    event TicketBought(address indexed buyer, string category, uint256 ticketPrice );
 
     /// @notice Struct for storing information about a ticket
     struct Ticket {
         uint256 ticketId;
-        bool isSold;
+        address buyer;
         uint256 eventId;
         uint256 price;
         string category;
@@ -42,12 +42,15 @@ contract Ticketing {
 
     /// @notice Struct for storing information about an order
     struct MyOrder {
+        string purchaser;
         uint timestamp;
-        Ticket ticket;
+        Ticket[] tickets;
     }
 
     /// @notice Mapping of event IDs to events
     mapping(uint256 => Event) public events;
+    
+    mapping(uint256 => string[]) eventAttendees;
 
     /// @notice Mapping of user addresses to the number of orders they've made
     mapping(address => uint256) public orderCount;
@@ -64,8 +67,23 @@ contract Ticketing {
     /// @notice Total number of events created
     uint256 public numEvents;
 
+    mapping(address => mapping(string => Ticket[]))TicketsBought;
+
     /// @notice Duration for which tickets will be sold for an event
     uint256 constant SELLINGDURATION = 10 minutes;
+
+    /// @notice modifier checking for invalid inputs
+    modifier OnlyValidInput (string calldata _value){
+        require(bytes(_value).length  > 0,"Invalid input");
+        _;
+    }
+
+    /// @notice modifier for ensuring non-zero inputs
+    modifier NonZero (uint _value) {
+        require(_value > 0, "Invalid input");
+        _;
+    } 
+
 
     /// @notice Allows an event organizer to create an event and sell tickets
     function addEvent(
@@ -73,10 +91,13 @@ contract Ticketing {
         uint256 _numSilverTickets,
         uint _vipTicketPrice,
         uint _silverTicketPrice,
-        string memory _eventName,
+        string calldata _eventName,
         uint256 _eventDate,
-        string memory _eventVenue
-    ) public {
+        string calldata _eventVenue
+    ) public OnlyValidInput(_eventName)
+     OnlyValidInput(_eventVenue) NonZero(_numVipTickets)
+     NonZero(_numSilverTickets) NonZero(_numVipTickets)
+     {
         Event storage newEvent = events[numEvents];
         newEvent.eventId = numEvents;
         newEvent.owner = msg.sender;
@@ -89,33 +110,9 @@ contract Ticketing {
         newEvent.eventDate = _eventDate;
         newEvent.eventVenue = _eventVenue;  
         
-        for (uint256 i = 0; i < _numVipTickets; i++) {
-            Ticket memory ticket = Ticket({
-                ticketId: i,
-                isSold: false,
-                eventId: numEvents,
-                price: _vipTicketPrice,
-                category: "VIP",
-                eventName: _eventName,
-                eventDate: _eventDate,
-                eventVenue:_eventVenue
-
-            });
-            newEvent.vipTickets.push(ticket);
-        }
-        for (uint256 i = 0; i < _numSilverTickets; i++) {
-            newEvent.silverTickets.push(Ticket({
-                ticketId: i,
-                isSold: false,
-                eventId: numEvents,
-                price: _silverTicketPrice,
-                category: "Silver",
-                eventName: _eventName,
-                eventDate: _eventDate,
-                eventVenue:_eventVenue
-
-            }));
-        }
+        
+        
+        
         numEvents++;
         // Add order for user
         myEventCount[msg.sender]++; // <-- Order ID
@@ -123,57 +120,122 @@ contract Ticketing {
         
 
          emit EventCreated(msg.sender, newEvent.eventId, newEvent.eventName, newEvent.vipTicketPrice, newEvent.silverTicketPrice, _eventDate);
-
-   
     }
+
+
     /// @notice Allows a user to buy a ticket for an event
-    function buyTicket(uint256 _eventId, string memory _category) public payable{
+    function buyTicket(uint256 _eventId,
+     string calldata _eventName, 
+     string calldata _category,
+     string calldata _BuyerName, 
+     uint _NumberofTickets
+     ) public payable 
+     OnlyValidInput(_eventName) 
+     OnlyValidInput(_category) 
+     OnlyValidInput(_BuyerName)
+     NonZero(_eventId)
+     NonZero(_NumberofTickets)
+     {
         Event storage eventToBuy = events[_eventId];
         Ticket[] storage ticketsToBuy;
         uint256 numTicketsSold;
         uint256 ticketPrice;
 
+        
+        
+
         require(block.timestamp <= eventToBuy.sellingDuration, "Ticket Selling Duration has passed");
 
         
 
-        if (keccak256(bytes32(_category)) == keccak256(bytes32("VIP"))) {
+        if (keccak256(abi.encodePacked(_category)) == keccak256(abi.encodePacked("VIP"))) {
             require(eventToBuy.vipSold < eventToBuy.numVipTickets, "All VIP tickets are sold out");
-            ticketsToBuy = eventToBuy.vipTickets;
-            numTicketsSold = eventToBuy.vipSold;
-            ticketPrice = eventToBuy.vipTicketPrice;
-            eventToBuy.vipSold++;
-        } else if (keccak256(bytes32(_category)) == keccak256(bytes32("Silver"))) {
+            
+            /*ticketsToBuy = eventToBuy.vipTickets;
+            numTicketsSold = eventToBuy.vipSold;*/
+
+            ticketPrice = eventToBuy.vipTicketPrice; 
+            uint x = eventToBuy.vipSold;
+            for (uint256 i = 0; i < _NumberofTickets ; i++) {
+            Ticket memory TiKi= Ticket({
+                ticketId: x + i,
+                buyer: msg.sender,
+                eventId: numEvents,
+                price: eventToBuy.vipTicketPrice,
+                category: "VIP",
+                eventName: eventToBuy.eventName,
+                eventDate: eventToBuy.eventDate,
+                eventVenue:eventToBuy.eventVenue
+
+            });
+            TicketsBought[msg.sender][_BuyerName].push(TiKi);
+            eventToBuy.vipTickets.push(TiKi);
+            ticketsToBuy.push(TiKi);
+            }
+
+            eventToBuy.vipSold + _NumberofTickets; 
+        } else if (keccak256(abi.encodePacked(_category)) == keccak256(abi.encodePacked("Silver"))) {
             require(eventToBuy.silverSold < eventToBuy.numSilverTickets, "All Silver tickets are sold out");
-            ticketsToBuy = eventToBuy.silverTickets;
-            numTicketsSold = eventToBuy.silverSold;
+            
+            /*ticketsToBuy = eventToBuy.silverTickets;
+            numTicketsSold = eventToBuy.silverSold;*/
+
             ticketPrice = eventToBuy.silverTicketPrice;
-            eventToBuy.silverSold++;
+            uint x = eventToBuy.silverSold;
+            for (uint256 i = 0; i < _NumberofTickets; i++) {
+            Ticket memory TiKi = Ticket({
+                 ticketId: x + i,
+                buyer: msg.sender,
+                eventId: numEvents,
+                price: eventToBuy.silverTicketPrice,
+                category: "Silver",
+                eventName: eventToBuy.eventName,
+                eventDate: eventToBuy.eventDate,
+                eventVenue:eventToBuy.eventVenue
+            
+            
+            });
+            TicketsBought[msg.sender][_BuyerName].push(TiKi);
+            eventToBuy.silverTickets.push(TiKi);
+            ticketsToBuy.push(TiKi);
+            }
+            eventToBuy.silverSold + _NumberofTickets;
+            
         } else {
             revert("Invalid ticket category");
         }
 
-        require(msg.value == ticketPrice, "Incorrect amount sent");
-        payable(eventToBuy.owner).transfer(ticketPrice);
-        Ticket storage ticketToBuy = ticketsToBuy[numTicketsSold];
-        require(!ticketToBuy.isSold, "Ticket already sold");
-        ticketToBuy.isSold = true;
+        require(msg.value == (ticketPrice * _NumberofTickets), "Incorrect amount sent");
+        payable(eventToBuy.owner).transfer(ticketPrice * _NumberofTickets);
+        
+        //Ticket storage ticketToBuy = ticketsToBuy[numTicketsSold];
+        //require(!ticketToBuy.isSold, "Ticket already sold");
+        //ticketToBuy.isSold = true;
         // Create order
-        MyOrder memory order = MyOrder(block.timestamp, ticketToBuy);
+
+        MyOrder memory order = MyOrder(_BuyerName, block.timestamp, ticketsToBuy);
+        
         // Add order for user
         orderCount[msg.sender]++; // <-- Order ID
         myOrders[msg.sender][orderCount[msg.sender]] = order;
 
         
 
-        emit TicketBought(msg.sender, _category, ticketPrice )
+        emit TicketBought(msg.sender, _category, ticketPrice );
     }
 
+    /*
     /// @notice Gets the information for an event
     /// @param _eventId The ID of the event to retrieve information for
     /// @return The address of the event owner, the number of VIP tickets, the number of Silver tickets,
     /// the number of VIP tickets sold, the number of Silver tickets sold, the event name, the event date,
     /// and the event venue
+    /// @title A title that should describe the contract/interface
+    /// @author The name of the author
+    /// @notice Explain to an end user what this does
+    /// @dev Explain to a developer any extra details
+    */
+
     function getEvent(uint256 _eventId) public view returns (address eventOwner, uint256 eventId, uint256 numVipTickets, uint256 numSilverTickets, uint256 vipSold, uint256 silverSold, uint256 sellingDuration, string memory eventName, string memory _eventVenue, uint256 eventDate, Ticket[] memory vipTickets, Ticket[] memory silverTickets) {
         Event storage eventToGet = events[_eventId];
         return (eventToGet.owner, eventToGet.eventId, eventToGet.numVipTickets, eventToGet.numSilverTickets, eventToGet.vipSold, eventToGet.silverSold, eventToGet.sellingDuration, eventToGet.eventName,eventToGet.eventVenue, eventToGet.eventDate, eventToGet.vipTickets, eventToGet.silverTickets);
